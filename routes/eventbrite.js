@@ -6,6 +6,8 @@ const EB_TOKEN = process.env.EVENTBRITE_TOKEN;
 
 router.get('/eventbrite-events', async (req, res) => {
   const { lat, lon, radius = '20km' } = req.query;
+ console.log('TOKEN USADO:', EB_TOKEN);
+
 
   try {
     const response = await axios.get('https://www.eventbriteapi.com/v3/events/search/', {
