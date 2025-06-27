@@ -1,30 +1,31 @@
 import express from 'express';
 import axios from 'axios';
+import dotenv from 'dotenv';
+
+dotenv.config();
 const router = express.Router();
 
-const EB_TOKEN = process.env.EVENTBRITE_TOKEN;
+const EVENTBRITE_TOKEN = process.env.EVENTBRITE_TOKEN;
+const ORGANIZATION_ID = process.env.EVENTBRITE_ORGANIZATION_ID;
 
-router.get('/eventbrite-events', async (req, res) => {
-  const { lat, lon, radius = '20km' } = req.query;
-  console.log('TOKEN USADO:', EB_TOKEN);
-
+// Buscar eventos de uma organização específica no Eventbrite
+router.get('/eventbrite', async (req, res) => {
   try {
-    const response = await axios.get('https://www.eventbriteapi.com/v3/events/search/', {
-      headers: { Authorization: `Bearer ${EB_TOKEN}` },
-      params: {
-        'location.latitude': lat,
-        'location.longitude': lon,
-        'location.within': radius,
-        expand: 'venue'
+    const response = await axios.get(
+      `https://www.eventbriteapi.com/v3/organizations/${ORGANIZATION_ID}/events/`,
+      {
+        headers: {
+          Authorization: `Bearer ${EVENTBRITE_TOKEN}`
+        }
       }
-    });
-
-    res.json(response.data.events);
+    );
+    res.json(response.data);
   } catch (error) {
-    console.error('Erro Eventbrite:', error?.response?.data || error.message);
-    res.status(500).json({ error: 'Erro ao obter eventos da Eventbrite', detalhe: error?.response?.data || error.message });
+    console.error('Erro ao buscar eventos do Eventbrite:', error.message);
+    res.status(500).json({ error: 'Erro ao buscar eventos do Eventbrite.' });
   }
 });
 
 export default router;
+
 
